@@ -1,10 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema()
+@Schema({timestamps: true})
 export class ExpoToken  extends Document{
-  @Prop()
+  @Prop({required: true})
   token: string;
+
+  @Prop({required: true})
+  deviceId: string;
 }
 
 export const ExpoTokenSchema = SchemaFactory.createForClass(ExpoToken);
