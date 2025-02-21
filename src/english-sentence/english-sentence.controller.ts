@@ -9,6 +9,7 @@ export class EnglishSentenceController {
 
   @Post()
   create(@Body() createEnglishSentenceDto: CreateEnglishSentenceDto) {
+    console.log(createEnglishSentenceDto)
     return this.englishSentenceService.create(createEnglishSentenceDto);
   }
 

@@ -17,16 +17,6 @@ export class SchedulesController {
     return this.schedulesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.schedulesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateScheduleDto: UpdateScheduleDto) {
-    return this.schedulesService.update(+id, updateScheduleDto);
-  }
-
   @Delete(':deviceId')
   remove(@Param('deviceId') deviceId: string) {
     return this.schedulesService.remove(deviceId);

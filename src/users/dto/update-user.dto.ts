@@ -11,9 +11,13 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  readonly password: string;
+  readonly password?: string;
 
   @IsBoolean()
   @IsOptional()
   readonly isAdmin?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  readonly isLoggedIn?: boolean;
 }

@@ -8,7 +8,7 @@ export class Setting {
     })
     user_id: string
 
-    @Prop({default: 1})
+    @Prop({default: () => [process.env.DEFAULT_MINUTES]})
     minutes?: number
 
     @Prop({default: false})
@@ -21,7 +21,7 @@ export class Setting {
     isToday?: boolean
 
     @Prop({default: 0})
-    datesBeforeNumber?: number
+    arrayOfDates?: Date[]
 }
 export const SettingSchema = SchemaFactory.createForClass(Setting)
 

@@ -50,7 +50,18 @@ export class UserMongodbRespository implements UserRespository {
     
       async update(id: string, updateUserDto: UpdateUserDto) {
         try {
-          const user = await this.userModel.findById(id).exec();
+          const user = await this.userModel.findByIdAndUpdate(id, updateUserDto).exec();
+          return {
+            message: 'User retrieved successfully',
+             user
+          };
+        } catch (error) {
+          throw new HttpException("Something went wrong with server", 500)
+        }
+      }
+      async updateLoggedIn(id: string, isLoggedIn) {
+        try {
+          const user = await this.userModel.findByIdAndUpdate(id, {isLoggedIn}).exec();
           return {
             message: 'User retrieved successfully',
              user
@@ -72,13 +83,10 @@ export class UserMongodbRespository implements UserRespository {
         }
       }
     
-      async findByEmail(email: string) {
+      async findByEmail(email: string): Promise<User> {
         try {
           const user = await this.userModel.findOne({email}).exec();
-          return {
-            message: 'User retrieved successfully',
-            user
-          };
+          return user
         } catch (error) {
           console.log(error)
           throw new HttpException(error.message, error.status)

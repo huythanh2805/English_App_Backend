@@ -10,7 +10,10 @@ export class User extends Document {
     password: string;
 
     @Prop({ default: false })
-    isAdmin: boolean;
+    isAdmin?: boolean;
+
+    @Prop({ default: false })
+    isLoggedIn?: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

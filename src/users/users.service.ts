@@ -29,12 +29,15 @@ export class UserService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     return this.userRespository.update(id, updateUserDto)
   }
+  async updateLoggedIn(id: string, isLoggedIn: boolean) {
+    return this.userRespository.updateLoggedIn(id, isLoggedIn)
+  }
 
   async remove(id: string) {
     return this.userRespository.remove(id)
   }
 
-  async findByEmail(email: string): Promise<any> {
+  async findByEmail(email: string): Promise<User> {
     return this.userRespository.findByEmail(email)
   }
 }

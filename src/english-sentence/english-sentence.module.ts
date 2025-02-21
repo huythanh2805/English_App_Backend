@@ -8,6 +8,9 @@ import { EnglishSentence, EnglishSentenceSchema } from './entities/english-sente
   imports: [MongooseModule.forFeature([{name: EnglishSentence.name, schema: EnglishSentenceSchema}])],
   controllers: [EnglishSentenceController],
   providers: [EnglishSentenceService],
-  exports: [MongooseModule.forFeature([{name: EnglishSentence.name, schema: EnglishSentenceSchema}])]
+  exports: [
+    MongooseModule.forFeature([{name: EnglishSentence.name, schema: EnglishSentenceSchema}]),
+    EnglishSentenceService
+]
 })
 export class EnglishSentenceModule {}

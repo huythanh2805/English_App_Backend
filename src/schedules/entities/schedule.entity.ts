@@ -6,9 +6,8 @@ export class Schedule extends Document {
     @Prop({ required: true, unique: true })
     name: string;
 
-    @Prop({ default: 1})
-    mimutes?: number;
-    
+    @Prop({ required: true})
+    user_id?: string;
 }
 
 export const ScheduleSchema = SchemaFactory.createForClass(Schedule);

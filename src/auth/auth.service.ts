@@ -13,36 +13,43 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly scheduleRegister: SchedulerRegistry,
+    private readonly scheduleRegistry: SchedulerRegistry,
     private readonly configService: ConfigService,
     private readonly settingsService: SettingsService,
     private readonly scheduleService: SchedulesService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const data = await this.userService.findByEmail(email);
-    if (!data || !data.user) {
+    const user = await this.userService.findByEmail(email);
+    if (!user || !user) {
       throw new NotFoundException('User not found');
     }
-    if (await bcrypt.compare(password, data?.user.password)) {
-      return data?.user;
+    if (await bcrypt.compare(password, user.password)) {
+      return user;
     }
   }
 
   async checkExistUser(email: string): Promise<any> {
-    const data = await this.userService.findByEmail(email);
-    if (data.user) {
+    const user = await this.userService.findByEmail(email);
+    if (user) {
       throw new HttpException("User exist", 400)
+    }
+    return null;
+  }
+  async checkUserLoggedIn(email: string): Promise<any> {
+    const {isLoggedIn} = await this.userService.findByEmail(email);
+    if (isLoggedIn) {
+      throw new HttpException("User Logged In", 400)
     }
     return null;
   }
   async checkUserSetting(user: any, deviceId: string){
      const { isTurnOn } = await this.settingsService.findSettingByUserId(user._id)
-    //  adding schedule in db 
-    await this.scheduleService.create({name: deviceId})
+    //  adding schedule in db and dynamic cronjob 
+    await this.scheduleService.create({name: deviceId, user_id: user._doc._id})
     //  If setting turn on schedule will turn on
      if(isTurnOn){
-      const job = this.scheduleRegister.getCronJob(deviceId)
+      const job = this.scheduleRegistry.getCronJob(deviceId)
       job.start()
      }
   }
@@ -53,12 +60,16 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
       });
+      // Check if setting user is turn on will create new schedule
       await this.checkUserSetting(user, deviceId)
+      // Update user logged in
+      await this.userService.updateLoggedIn(user._id, true)
       return {
         message: "Login success",
         access_token: accessToken
       }
     } catch (error) {
+      console.log(error)
       throw new HttpException(error.message, 400)
     }
   }
@@ -73,6 +84,7 @@ export class AuthService {
         user: newUser
       }
     } catch (error) {
+      console.log(error)
       throw new HttpException("Register failed", 500)
     }
   }
@@ -81,10 +93,10 @@ export class AuthService {
     const {deviceId, user_id} = body
     const userExisting = await this.userService.findOne(user_id)
     if(!userExisting) throw new NotFoundException("Không tìm thấy user")
-    // delete current schedule
-    const job = this.scheduleRegister.deleteCronJob(deviceId)
     // delete from db
     await this.scheduleService.remove(deviceId)
+    // Update user logged in
+    await this.userService.updateLoggedIn(user_id, false)
     return {
       message: "Logout successfully!",
     }

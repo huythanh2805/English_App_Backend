@@ -15,7 +15,7 @@ export class EnglishSentence extends Document{
     isSend: boolean
 
     @Prop({default: false})
-    isCompleted: boolean
+    isCompleted?: boolean
 
 }
 export const EnglishSentenceSchema = SchemaFactory.createForClass(EnglishSentence);
