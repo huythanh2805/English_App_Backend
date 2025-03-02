@@ -8,7 +8,6 @@ export class LoginDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(6)
   readonly password: string;
 
   @IsBoolean()
@@ -16,5 +15,6 @@ export class LoginDto {
   readonly isAdmin?: boolean;
 
   @IsString()
-  readonly deviceId: string;
+  @IsOptional()
+  readonly deviceId?: string;
 }

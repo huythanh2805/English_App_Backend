@@ -8,7 +8,6 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(6)
   readonly password: string;
 
   @IsBoolean()

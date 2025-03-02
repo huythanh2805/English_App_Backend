@@ -17,7 +17,8 @@ export class AuthController {
   }
   @Post('register')
   async register(@Body() body: RegisterDto) {
-    await this.authService.checkExistUser(body.email);
+   const existingUser = await this.authService.checkExistUser(body.email);
+   if(existingUser === null)
     return this.authService.register(body.email, body.password);
   }
   @Post('logout')

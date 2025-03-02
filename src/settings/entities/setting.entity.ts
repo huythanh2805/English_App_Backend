@@ -8,7 +8,7 @@ export class Setting {
     })
     user_id: string
 
-    @Prop({default: () => [process.env.DEFAULT_MINUTES]})
+    @Prop({default: () => Number(process.env.DEFAULT_MINUTES)})
     minutes?: number
 
     @Prop({default: false})

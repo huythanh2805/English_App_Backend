@@ -19,21 +19,16 @@ import { SchedulesModule } from 'src/schedules/schedules.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN')},
+        // signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN')},
       }),
     }),
     ConfigModule,
     UserModule,
     PassportModule,
     SettingsModule,
-    SchedulesModule
+    SchedulesModule,
   ],
-  providers: [
-     AuthService,
-     JwtStrategy,
-     UserService,
-     SettingsService,
-  ],
+  providers: [AuthService, JwtStrategy, UserService, SettingsService],
   controllers: [AuthController],
 })
 export class AuthModule {}
