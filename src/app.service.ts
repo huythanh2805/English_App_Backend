@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { EnglishSentence } from './english-sentence/entities/english-sentence.entity';
 import { SchedulesService } from './schedules/schedules.service';
-import { CronJob } from 'cron';
+import { SettingsService } from './settings/settings.service';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -15,12 +15,18 @@ export class AppService implements OnModuleInit {
     @InjectModel(EnglishSentence.name)
     private readonly EnglishSentence: Model<EnglishSentence>,
     private readonly scheduleService: SchedulesService,
+    private readonly settingService: SettingsService
   ) {}
   async onModuleInit() {
     const shedules = await this.scheduleService.findAll();
     shedules.map(async (sche) => {
       const job = await this.scheduleService.createNewDynamicCronJob({name: sche.name, user_id: sche.user_id});
-      if(job) job.start()
+      if(job){
+        job.start()
+        this.logger.log('Job has been started')
+      }
+      await this.scheduleService.start(sche.name)
+      this.logger.log('Job has been started 2')
     });
   }
   getHello(): string {

@@ -22,6 +22,6 @@ export class CreateSettingDto {
 
     @IsNumber()
     @IsOptional()
-    datesBeforeNumber?: number 
+    arrayOfDates?: Date[] 
 
 }

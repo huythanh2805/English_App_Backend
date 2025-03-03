@@ -29,14 +29,15 @@ export class SchedulesService {
 
   async sendingNotifycation({ user_id, deviceId, arrayOfDates, isLoop, isToday }: SendingNotifycationType) {
     const expoToken = await this.expoTokenService.findExpoToken(deviceId);
-    const sentence =
-      await this.englishSentenceService.findOneEnglishSentence({user_id, arrayOfDates, isLoop, isToday});
-    if(!sentence) return
+    // const sentence =
+    //   await this.englishSentenceService.findOneEnglishSentence({user_id, arrayOfDates, isLoop, isToday});
+    // if(!sentence) return
+
     const message: ExpoPushMessage = {
-      to: 'ExponentPushToken[sMpgBNK0Lk7DhCqae_RdL8]',
+      to: expoToken,
       sound: 'default',
       title: 'Test gửi thông báo',
-      body: 'đây là nội dung',
+      body: `Đây là nội dung được gửi sau 1 phút`,
       priority: 'high',
       data: { someData: 'goes here' },
     };
@@ -62,10 +63,8 @@ export class SchedulesService {
   }): Promise<CronJob | void> {
     const { minutes, isLoop, isTurnOn, arrayOfDates, isToday } =
     await this.settingsService.findSettingByUserId(user_id);
-    if (!isTurnOn) return this.logger.log(`Schedule of ${user_id} is turn off`);
-
     const job = new CronJob(
-      `*/${minutes || process.env.DEFAULT_MINUTES} * * * *`,
+      `*/${minutes || process.env.DEFAULT_MINUTES} * * * * *`,
       async () => {
         await this.sendingNotifycation({
           deviceId: name,
@@ -77,8 +76,10 @@ export class SchedulesService {
       },
     );
     this.schedulerRegistry.addCronJob(name, job);
+    this.logger.log(`Schedule of ${user_id} has been created`);
     return job;
   }
+
   async create(createScheduleDto: CreateScheduleDto) {
     const { name, user_id } = createScheduleDto;
     this.createNewDynamicCronJob({ name, user_id });
@@ -93,8 +94,19 @@ export class SchedulesService {
 
   remove(deviceId: string) {
     // delete current schedule
-    this.schedulerRegistry.deleteCronJob(deviceId);
+    const job = this.schedulerRegistry.getCronJob(deviceId)
+    if(job){
+      this.schedulerRegistry.deleteCronJob(deviceId);
+    }
     // remove from db
     return this.scheduleModel.deleteOne({ name: deviceId });
+  }
+  start(deviceId: string) {
+    const job = this.schedulerRegistry.getCronJob(deviceId)
+     job.start()
+  }
+  stop(deviceId: string) {
+    const job = this.schedulerRegistry.getCronJob(deviceId)
+     job.stop()
   }
 }

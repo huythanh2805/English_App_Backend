@@ -16,7 +16,7 @@ export class ExpoTokenService {
   async findExpoToken (deviceId: string){
     const expoToken = await this.ExpoTokenModel.findOne({deviceId})
     if(!expoToken) return null
-    return expoToken
+    return expoToken.token
   }
   async create(createExpoTokenDto: CreateExpoTokenDto) {
     try {

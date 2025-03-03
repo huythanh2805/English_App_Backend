@@ -18,8 +18,8 @@ export class SettingsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.settingsService.findOne(id);
+  findSettingByUserId(@Param('id') id: string) {
+    return this.settingsService.findSettingByUserId(id);
   }
 
   @Patch()
