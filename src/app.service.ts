@@ -20,6 +20,8 @@ export class AppService implements OnModuleInit {
   async onModuleInit() {
     const shedules = await this.scheduleService.findAll();
     shedules.map(async (sche) => {
+       const { minutes, isLoop, isTurnOn, arrayOfDates, isToday } =
+          await this.settingService.findSettingByUserId(sche.user_id);
       const job = await this.scheduleService.createNewDynamicCronJob({name: sche.name, user_id: sche.user_id});
       if(job){
         job.start()

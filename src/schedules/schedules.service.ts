@@ -27,7 +27,13 @@ export class SchedulesService {
     this.expo = new Expo();
   }
 
-  async sendingNotifycation({ user_id, deviceId, arrayOfDates, isLoop, isToday }: SendingNotifycationType) {
+  async sendingNotifycation({
+    user_id,
+    deviceId,
+    arrayOfDates,
+    isLoop,
+    isToday,
+  }: SendingNotifycationType) {
     const expoToken = await this.expoTokenService.findExpoToken(deviceId);
     // const sentence =
     //   await this.englishSentenceService.findOneEnglishSentence({user_id, arrayOfDates, isLoop, isToday});
@@ -57,14 +63,21 @@ export class SchedulesService {
   async createNewDynamicCronJob({
     name,
     user_id,
+    minutes,
+    isLoop,
+    isToday,
+    arrayOfDates
   }: {
     name: string;
     user_id: string;
+    minutes?: number;
+    isLoop?: boolean;
+    isTurnOn?: boolean;
+    arrayOfDates?: any;
+    isToday?: boolean;
   }): Promise<CronJob | void> {
-    const { minutes, isLoop, isTurnOn, arrayOfDates, isToday } =
-    await this.settingsService.findSettingByUserId(user_id);
     const job = new CronJob(
-      `*/${minutes || process.env.DEFAULT_MINUTES} * * * * *`,
+      `*/${minutes || process.env.DEFAULT_MINUTES} * * * *`,
       async () => {
         await this.sendingNotifycation({
           deviceId: name,
@@ -94,19 +107,19 @@ export class SchedulesService {
 
   remove(deviceId: string) {
     // delete current schedule
-    const job = this.schedulerRegistry.getCronJob(deviceId)
-    if(job){
+    const job = this.schedulerRegistry.getCronJob(deviceId);
+    if (job) {
       this.schedulerRegistry.deleteCronJob(deviceId);
     }
     // remove from db
     return this.scheduleModel.deleteOne({ name: deviceId });
   }
   start(deviceId: string) {
-    const job = this.schedulerRegistry.getCronJob(deviceId)
-     job.start()
+    const job = this.schedulerRegistry.getCronJob(deviceId);
+    job.start();
   }
   stop(deviceId: string) {
-    const job = this.schedulerRegistry.getCronJob(deviceId)
-     job.stop()
+    const job = this.schedulerRegistry.getCronJob(deviceId);
+    job.stop();
   }
 }

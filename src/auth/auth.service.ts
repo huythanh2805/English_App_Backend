@@ -56,6 +56,8 @@ export class AuthService {
     if (isTurnOn) {
       const job = this.scheduleRegistry.getCronJob(deviceId);
        job.start();
+       console.log('login start')
+       
     }
   }
   async login(user: any, deviceId: string) {
