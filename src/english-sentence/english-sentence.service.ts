@@ -20,22 +20,76 @@ export class EnglishSentenceService {
     isToday,
     isLoop,
   }: Omit<SendingNotifycationType, 'deviceId'>) {
-    const sentence = await this.findOneSentenceInTodayByUID(user_id)
-    if(!sentence) return null
+    // const sentence = isToday ?
+    //  await this.getOneSentenceInTodayByUID(user_id, isLoop) :
+    //  await this.getOneSentenceInAllDaysByUId(user_id, isLoop)
+    return await this.getOneSentenceInTodayByUID(user_id, isLoop) 
+  }
+  async findOneSentenceInAllDays (user_id: string){
+    const allSentence =  await this.EnglishSentence.find({
+      user_id,
+      isCompleted: false,
+      isSend: false
+    }).exec();
+    const randomNum = Math.floor(Math.random() * allSentence.length )
+    const randomSentence = allSentence.find((item, index) => index == randomNum ) as EnglishSentence
+    if(randomSentence) (randomSentence.isSend = true), randomSentence.save();
+    return randomSentence
+  }
+  async getOneSentenceInAllDaysByUId(user_id: string, isLoop: boolean) {
+    try {
+      const sentence = await this.findOneSentenceInAllDays(user_id)
+      // Cập nhật lại trạng thái đã gửi nếu người dùng muốn lặp lại vô tận
+      if(isLoop && !sentence) {
+        await this.EnglishSentence.updateMany({
+          user_id,
+        },
+        {
+          isSend: false
+        }
+      ).exec()
+      return await this.findOneSentenceInAllDays(user_id)
+      }
+      return sentence;
+    } catch (error) {
+      console.error('Error fetching sentences:', error);
+      throw new HttpException(
+        'Something went wrong with fetch sentence in today',
+        500,
+      );
+    }
+  }
+  async findOneSentenceInday (user_id: string){
+    const sentence =  await this.EnglishSentence.findOne({
+      user_id,
+      createdAt: {
+        $gte: startOfToday(),
+        $lte: endOfToday(),
+      },
+      isCompleted: false,
+      isSend: false
+    }).exec();
+    if(sentence) (sentence.isSend = true), sentence.save();
     return sentence
   }
-
-  async findOneSentenceInTodayByUID(user_id: string): Promise<EnglishSentence> {
+  async getOneSentenceInTodayByUID(user_id: string, isLoop: boolean): Promise<EnglishSentence> {
     try {
-      const sentence = await this.EnglishSentence.findOne({
-        user_id,
-        createdAt: {
-          $gte: startOfToday(),
-          $lte: endOfToday(),
+      const sentence = await this.findOneSentenceInday(user_id)
+      // Cập nhật lại trạng thái đã gửi nếu người dùng muốn lặp lại vô tận
+      if(isLoop && !sentence) {
+        await this.EnglishSentence.updateMany({
+          user_id,
+          createdAt: {
+            $gte: startOfToday(),
+            $lte: endOfToday(),
+          },
         },
-        isCompleted: false
-      }).exec();
-      (sentence.isSend = true), sentence.save();
+        {
+          isSend: false
+        }
+      ).exec()
+      return await this.findOneSentenceInday(user_id)
+      }
       return sentence;
     } catch (error) {
       console.error('Error fetching sentences:', error);
@@ -66,6 +120,10 @@ export class EnglishSentenceService {
     }
   }
 
+  async getUserSentences(user_id: string){
+    return this.EnglishSentence.find({user_id})
+  }
+
   create(createEnglishSentenceDto: CreateEnglishSentenceDto) {
     return this.EnglishSentence.create(createEnglishSentenceDto);
   }
@@ -85,7 +143,7 @@ export class EnglishSentenceService {
     );
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.EnglishSentence.findByIdAndDelete(id);
   }
 }

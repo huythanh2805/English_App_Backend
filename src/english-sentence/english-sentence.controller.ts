@@ -9,7 +9,6 @@ export class EnglishSentenceController {
 
   @Post()
   create(@Body() createEnglishSentenceDto: CreateEnglishSentenceDto) {
-    console.log(createEnglishSentenceDto)
     return this.englishSentenceService.create(createEnglishSentenceDto);
   }
 
@@ -22,6 +21,10 @@ export class EnglishSentenceController {
   findOne(@Param('id') id: string) {
     return this.englishSentenceService.findOne(+id);
   }
+  @Get(':id/my-sentence')
+  getUserSentences(@Param('id') userId: string) {
+    return this.englishSentenceService.getUserSentences(userId);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEnglishSentenceDto: UpdateEnglishSentenceDto) {
@@ -30,6 +33,6 @@ export class EnglishSentenceController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.englishSentenceService.remove(+id);
+    return this.englishSentenceService.remove(id);
   }
 }

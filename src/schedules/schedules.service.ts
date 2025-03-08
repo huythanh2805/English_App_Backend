@@ -35,17 +35,17 @@ export class SchedulesService {
     isToday,
   }: SendingNotifycationType) {
     const expoToken = await this.expoTokenService.findExpoToken(deviceId);
-    // const sentence =
-    //   await this.englishSentenceService.findOneEnglishSentence({user_id, arrayOfDates, isLoop, isToday});
-    // if(!sentence) return
+    const sentence = await this.englishSentenceService.findOneEnglishSentence({user_id, arrayOfDates, isLoop, isToday});
+    console.log({sentence: sentence.sentence})
+    if(!sentence) return
 
     const message: ExpoPushMessage = {
       to: expoToken,
       sound: 'default',
-      title: 'Test gửi thông báo',
-      body: `Đây là nội dung được gửi sau 1 phút`,
+      title: 'Học từ mới đi con trai',
+      body: sentence.sentence,
       priority: 'high',
-      data: { someData: 'goes here' },
+      // data: { someData: 'goes here' },
     };
     console.log('-------------------');
     console.log('đang chạy');

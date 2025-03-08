@@ -22,8 +22,7 @@ export class ExpoTokenService {
     try {
       const { deviceId } = createExpoTokenDto;
       const existingExpoToken = await this.findExpoToken(deviceId)
-      if(existingExpoToken) throw new HttpException("ExpoToken is existing", 400)
-      const expoToken = await this.ExpoTokenModel.create(createExpoTokenDto);
+      const expoToken = existingExpoToken ? existingExpoToken : await this.ExpoTokenModel.create(createExpoTokenDto);
       return {
         message: "Success",
         data: {

@@ -70,7 +70,7 @@ export class AuthService {
       // Check if setting user is turn on will create new schedule
       await this.checkUserSetting(user, deviceId);
       // Update user logged in
-      await this.userService.updateLoggedIn(user._id, true);
+      // await this.userService.updateLoggedIn(user._id, true);
       return {
         message: 'Login success',
         access_token: accessToken,
