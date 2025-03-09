@@ -49,13 +49,10 @@ export class AuthService {
         user._id,
       );
       //  adding schedule in db and dynamic cronjob
-      const job = this.scheduleRegistry.getCronJob(deviceId);
-       if (!job) {
         await this.scheduleService.create({
           name: deviceId,
           user_id: user._doc._id,
-        });
-      }
+      })
       //  If setting turn on schedule will turn on
       if (isTurnOn) {
         const job = this.scheduleRegistry.getCronJob(deviceId);
@@ -63,7 +60,7 @@ export class AuthService {
          console.log('login start')
       }
     } catch (error) {
-      console.warn(`Cron job ${deviceId} không tồn tại, bỏ qua kiểm tra.`);
+      console.warn(`Không thể tạo cron job ${deviceId}`);
     }
   }
   async login(user: any, deviceId: string) {
