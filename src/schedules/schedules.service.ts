@@ -36,9 +36,7 @@ export class SchedulesService {
   }: SendingNotifycationType) {
     const expoToken = await this.expoTokenService.findExpoToken(deviceId);
     const sentence = await this.englishSentenceService.findOneEnglishSentence({user_id, arrayOfDates, isLoop, isToday});
-    console.log({sentence: sentence.sentence})
     if(!sentence) return
-
     const message: ExpoPushMessage = {
       to: expoToken,
       sound: 'default',

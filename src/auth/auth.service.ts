@@ -44,20 +44,26 @@ export class AuthService {
     return null;
   }
   async checkUserSetting(user: any, deviceId: string) {
-    const { isTurnOn } = await this.settingsService.findSettingByUserId(
-      user._id,
-    );
-    //  adding schedule in db and dynamic cronjob
-    await this.scheduleService.create({
-      name: deviceId,
-      user_id: user._doc._id,
-    });
-    //  If setting turn on schedule will turn on
-    if (isTurnOn) {
+    try {
+      const { isTurnOn } = await this.settingsService.findSettingByUserId(
+        user._id,
+      );
+      //  adding schedule in db and dynamic cronjob
       const job = this.scheduleRegistry.getCronJob(deviceId);
-       job.start();
-       console.log('login start')
-       
+       if (!job) {
+        await this.scheduleService.create({
+          name: deviceId,
+          user_id: user._doc._id,
+        });
+      }
+      //  If setting turn on schedule will turn on
+      if (isTurnOn) {
+        const job = this.scheduleRegistry.getCronJob(deviceId);
+         job.start();
+         console.log('login start')
+      }
+    } catch (error) {
+      console.warn(`Cron job ${deviceId} không tồn tại, bỏ qua kiểm tra.`);
     }
   }
   async login(user: any, deviceId: string) {
